@@ -28,8 +28,8 @@ def parse_args():
 
     parser.add_argument('--embedding_dim', default=256, type=int)
     parser.add_argument('--save_dir', '-s', type=str)
-    parser.add_argument('--num_layers', default=4, type=int,
-                        help='vit transformer layers')
+    parser.add_argument('--layer_num', '-l', default=6, type=int,
+                        help='ViT transformer layer num')
 
     parser.add_argument('--data', metavar='DIR', default='/home/tyl/code/bow/datasets/0710_上交_shaixuan91',
                         help='path to dataset')
@@ -167,7 +167,9 @@ def main_worker(gpu, ngpus_per_node, args):
         num_embeddings=len(trainset.final_weather2idx),
         embedding_dim=args.embedding_dim,
         name=args.arch,
-        pretrained=args.pretrained)
+        pretrained=args.pretrained,
+        layer_num = args.layer_num,
+        )
 
     # ckpt = torch.load("/home/tyl/code/bow/vit/PyTorch-Pretrained-ViT2/output/2024.08.17_合并天气_B322/checkpoint_27.pth.tar",
                     #   map_location='cpu')['state_dict']
@@ -231,18 +233,14 @@ def main_worker(gpu, ngpus_per_node, args):
             os.makedirs(save_dir)
         save_checkpoint({
             'epoch': epoch + 1,
-            'arch': args.arch,
             'state_dict': model.state_dict(),
             'best_acc1': best_acc1,
             'optimizer': optimizer.state_dict(),
-            'num_embeddings': model.num_embeddings,
-            'embedding_dim': model.embedding_dim,
-            'num_classes': model.num_classes,
             'weather2idx': trainset.weather2idx,
             'final_weather': trainset.final_weather,
             'final_weather2idx': trainset.final_weather2idx,
             'idx2label': trainset.idx2label,
-            'arch': args.arch
+            "args": args,
         }, is_best, filename=save_dir)
 
 

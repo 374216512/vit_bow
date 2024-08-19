@@ -13,8 +13,6 @@ import pandas as pd
 
 import os
 
-# from sklearn.metrics import accuracy_score, confusion_matrix
-
 
 def parse_args():
     parser = ArgumentParser(description='Multi-modal model')
@@ -23,9 +21,6 @@ def parse_args():
         '--path', type=str, default='/home/tyl/code/bow/ceshi/7.7with_weather')
     parser.add_argument('--model_path', type=str,
                         default='/home/tyl/code/bow/vit/PyTorch-Pretrained-ViT2/output/2024.08.17_合并天气_B3222')
-
-    parser.add_argument('-a', '--arch', metavar='ARCH', default='L_32',
-                        help='model architecture (default: resnet18)')
 
     return parser.parse_args()
 
@@ -45,15 +40,19 @@ def test_all_model():
         model_path = f"{args.model_path}/checkpoint_{i}.pth.tar"
 
         state_dict = torch.load(model_path)
+        ckpt_args = state_dict['args']
 
         final_weather = state_dict["final_weather"]
 
         # 定义模型
         model = MultiModalModel(
             num_embeddings=len(final_weather),
-            embedding_dim=state_dict["embedding_dim"],
-            name=state_dict['arch'],
+            embedding_dim=ckpt_args.embedding_dim,
+            name=ckpt_args.arch,
+            layer_num=ckpt_args.layer_num
         )
+
+        # 加载模型权重文件
         model.load_state_dict(state_dict['state_dict'], 'cuda')
         model = model.to('cuda')
 

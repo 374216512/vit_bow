@@ -54,6 +54,7 @@ class ViT(nn.Module):
         in_channels: int = 3,
         image_size: Optional[int] = None,
         num_classes: Optional[int] = None,
+        resize_positional_embedding=None
     ):
         super().__init__()
 
@@ -84,6 +85,7 @@ class ViT(nn.Module):
             if num_classes is None:
                 num_classes = PRETRAINED_MODELS[name]['num_classes']
         self.image_size = image_size
+        self.dim = dim
 
         # Image and patch sizes
         h, w = as_tuple(image_size)  # image sizes
@@ -211,6 +213,7 @@ class MultiModalModel(nn.Module):
         self,
         num_embeddings,
         embedding_dim,
+        layer_num,
         name: Optional[str] = None,
         pretrained: bool = False,
         num_classes=11,
@@ -223,6 +226,8 @@ class MultiModalModel(nn.Module):
 
         # 图像模型
         self.image_model = ViT(name=name, pretrained=pretrained, num_classes=num_classes)
+        self.image_model.transformer.blocks = self.image_model.transformer.blocks[:layer_num]  # 选择层数
+        vit_dim = self.image_model.dim
 
         # 天气模型
         self.weather_model = WeatherModel(
