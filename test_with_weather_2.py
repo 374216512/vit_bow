@@ -49,7 +49,8 @@ def test_all_model():
             num_embeddings=len(final_weather),
             embedding_dim=ckpt_args.embedding_dim,
             name=ckpt_args.arch,
-            layer_num=ckpt_args.layer_num
+            layer_num=ckpt_args.layer_num,
+            out_dim=ckpt_args.out_dim
         )
 
         # 加载模型权重文件

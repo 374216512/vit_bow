@@ -182,7 +182,7 @@ class ViT(nn.Module):
 
 
 class WeatherModel(nn.Module):
-    def __init__(self, num_embeddings, embedding_dim, num_classes):
+    def __init__(self, num_embeddings, embedding_dim, num_classes, out_dim):
         super().__init__()
         self.embedding = nn.Embedding(
             num_embeddings, embedding_dim)  # word2vec  (天气的数目, 映射之后的向量维度, )
@@ -191,12 +191,12 @@ class WeatherModel(nn.Module):
             nn.Linear(embedding_dim, 1024),
             nn.ReLU(),
             nn.Dropout(0.5),
-            nn.Linear(1024, 512),
+            nn.Linear(1024, out_dim),
             nn.ReLU(),
             nn.Dropout(0.5),
         )
 
-        self.classifier = nn.Linear(512, num_classes)
+        self.classifier = nn.Linear(out_dim, num_classes)
 
     def forward(self, x):
         x = self.embedding(x)
@@ -214,6 +214,7 @@ class MultiModalModel(nn.Module):
         num_embeddings,
         embedding_dim,
         layer_num,
+        out_dim,
         name: Optional[str] = None,
         pretrained: bool = False,
         num_classes=11,
@@ -223,19 +224,26 @@ class MultiModalModel(nn.Module):
         self.num_embeddings = num_embeddings
         self.embedding_dim = embedding_dim
         self.num_classes = num_classes
+        self.out_dim = out_dim
 
         # 图像模型
-        self.image_model = ViT(name=name, pretrained=pretrained, num_classes=num_classes)
-        self.image_model.transformer.blocks = self.image_model.transformer.blocks[:layer_num]  # 选择层数
+        self.image_model = ViT(
+            name=name, pretrained=pretrained, num_classes=num_classes)
+        # 选择层数
+        self.image_model.transformer.blocks = self.image_model.transformer.blocks[:layer_num]
         vit_dim = self.image_model.dim
 
         # 天气模型
         self.weather_model = WeatherModel(
-            num_embeddings, embedding_dim, num_classes)
+            num_embeddings=num_embeddings,
+            embedding_dim=embedding_dim,
+            num_classes=num_classes,
+            out_dim=out_dim)
 
+        final_dim = vit_dim+out_dim
         # 融合图像特征和天气特征之后的分类层
         self.fc = nn.Sequential(
-            nn.Linear(1280, 512),
+            nn.Linear(final_dim, 512),
             nn.ReLU(),
             nn.Dropout(),
             nn.Linear(512, 256),

@@ -26,14 +26,15 @@ from data_utils import MyDataset
 def parse_args():
     parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 
-    parser.add_argument('--embedding_dim', default=256, type=int)
+    parser.add_argument('--embedding_dim', default=128, type=int)
     parser.add_argument('--save_dir', '-s', type=str)
     parser.add_argument('--layer_num', '-l', default=6, type=int,
                         help='ViT transformer layer num')
+    parser.add_argument('--out_dim', type=int, default=512,help="天气模型最终的输出维度")
 
     parser.add_argument('--data', metavar='DIR', default='/home/tyl/code/bow/datasets/0710_上交_shaixuan91',
                         help='path to dataset')
-    parser.add_argument('-a', '--arch', metavar='ARCH', default='B_16',
+    parser.add_argument('-a', '--arch', metavar='ARCH', default='B_32',
                         help='model architecture (default: resnet18)')
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
@@ -61,7 +62,7 @@ def parse_args():
                         help='path to latest checkpoint (default: none)')
     parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                         help='evaluate model on validation set')
-    parser.add_argument('--pretrained', dest='pretrained', action='store_true',
+    parser.add_argument('--pretrained', dest='pretrained', action='store_false',
                         help='use pre-trained model')
     parser.add_argument('--world-size', default=-1, type=int,
                         help='number of nodes for distributed training')
@@ -169,6 +170,7 @@ def main_worker(gpu, ngpus_per_node, args):
         name=args.arch,
         pretrained=args.pretrained,
         layer_num = args.layer_num,
+        out_dim = args.out_dim
         )
 
     # ckpt = torch.load("/home/tyl/code/bow/vit/PyTorch-Pretrained-ViT2/output/2024.08.17_合并天气_B322/checkpoint_27.pth.tar",
