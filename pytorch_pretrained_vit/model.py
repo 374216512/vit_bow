@@ -212,9 +212,9 @@ class MultiModalModel(nn.Module):
     def __init__(
         self,
         num_embeddings,
-        embedding_dim,
+        weather_embedding_dim,
         layer_num,
-        out_dim,
+        weather_out_dim,
         name: Optional[str] = None,
         pretrained: bool = False,
         num_classes=11,
@@ -222,9 +222,9 @@ class MultiModalModel(nn.Module):
         super().__init__()
         # 保存参数
         self.num_embeddings = num_embeddings
-        self.embedding_dim = embedding_dim
+        self.weather_embedding_dim = weather_embedding_dim
         self.num_classes = num_classes
-        self.out_dim = out_dim
+        self.weather_out_dim = weather_out_dim
 
         # 图像模型
         self.image_model = ViT(
@@ -236,11 +236,11 @@ class MultiModalModel(nn.Module):
         # 天气模型
         self.weather_model = WeatherModel(
             num_embeddings=num_embeddings,
-            embedding_dim=embedding_dim,
+            embedding_dim=weather_embedding_dim,
             num_classes=num_classes,
-            out_dim=out_dim)
+            out_dim=weather_out_dim)
 
-        final_dim = vit_dim+out_dim
+        final_dim = vit_dim+weather_out_dim
         # 融合图像特征和天气特征之后的分类层
         self.fc = nn.Sequential(
             nn.Linear(final_dim, 512),

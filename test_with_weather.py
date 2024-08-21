@@ -61,7 +61,7 @@ def main():
     # 定义模型
     model = MultiModalModel(
         num_embeddings=len(state_dict["weather2idx"]),
-        embedding_dim=state_dict["embedding_dim"],
+        weather_embedding_dim=state_dict["embedding_dim"],
         name=state_dict['arch'],
     )
     model.load_state_dict(state_dict['state_dict'], 'cuda')

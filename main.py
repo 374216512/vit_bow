@@ -26,11 +26,12 @@ from data_utils import MyDataset
 def parse_args():
     parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 
-    parser.add_argument('--embedding_dim', default=128, type=int)
+    parser.add_argument('--weather_embedding_dim', default=128, type=int)
     parser.add_argument('--save_dir', '-s', type=str)
     parser.add_argument('--layer_num', '-l', default=6, type=int,
                         help='ViT transformer layer num')
-    parser.add_argument('--out_dim', type=int, default=512,help="天气模型最终的输出维度")
+    parser.add_argument('--weather_out_dim', type=int,
+                        default=512, help="天气模型最终的输出维度")
 
     parser.add_argument('--data', metavar='DIR', default='/home/tyl/code/bow/datasets/0710_上交_shaixuan91',
                         help='path to dataset')
@@ -166,15 +167,15 @@ def main_worker(gpu, ngpus_per_node, args):
     # model = ViT(args.arch, pretrained=args.pretrained)
     model = MultiModalModel(
         num_embeddings=len(trainset.final_weather2idx),
-        embedding_dim=args.embedding_dim,
+        weather_embedding_dim=args.weather_embedding_dim,
         name=args.arch,
         pretrained=args.pretrained,
-        layer_num = args.layer_num,
-        out_dim = args.out_dim
-        )
+        layer_num=args.layer_num,
+        weather_out_dim=args.weather_out_dim
+    )
 
     # ckpt = torch.load("/home/tyl/code/bow/vit/PyTorch-Pretrained-ViT2/output/2024.08.17_合并天气_B322/checkpoint_27.pth.tar",
-                    #   map_location='cpu')['state_dict']
+    #   map_location='cpu')['state_dict']
     # model.load_state_dict(ckpt)
     print("=> using model '{}' (pretrained={})".format(
         args.arch, args.pretrained))

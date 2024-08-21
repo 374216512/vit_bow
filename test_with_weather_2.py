@@ -47,10 +47,10 @@ def test_all_model():
         # 定义模型
         model = MultiModalModel(
             num_embeddings=len(final_weather),
-            embedding_dim=ckpt_args.embedding_dim,
+            weather_embedding_dim=ckpt_args.weather_embedding_dim,
             name=ckpt_args.arch,
             layer_num=ckpt_args.layer_num,
-            out_dim=ckpt_args.out_dim
+            weather_out_dim=ckpt_args.weather_out_dim
         )
 
         # 加载模型权重文件
